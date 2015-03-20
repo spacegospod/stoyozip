@@ -11,7 +11,7 @@ type iomanager struct {
 	out_file *os.File
 }
 
-func NewIomanager(out_path string) *iomanager {
+func newIomanager(out_path string) *iomanager {
 	iom := new(iomanager)
 
 	of, err := os.Create(out_path)

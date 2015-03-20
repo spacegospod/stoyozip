@@ -11,7 +11,7 @@ func Compress(inputPath, outputPath string) {
 	fileBytes, _ := ioutil.ReadFile(inputPath)
 	var pos int = 0
 
-	iom := NewIomanager(outputPath)
+	iom := newIomanager(outputPath)
 
 	for {
 		if pos >= len(fileBytes) {
@@ -19,9 +19,9 @@ func Compress(inputPath, outputPath string) {
 		}
 		p, l := findLongestChunk(window, fileBytes[pos:])
 		buf := new(bytes.Buffer)
-		binary.Write(buf, binary.LittleEndian, []int8{
-			int8(p),
-			int8(l),
+		binary.Write(buf, binary.LittleEndian, []uint8{
+			uint8(p),
+			uint8(l),
 		})
 
 		if l == 0 {

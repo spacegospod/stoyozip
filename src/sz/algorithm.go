@@ -3,7 +3,7 @@
 */
 package sz
 
-const WINDOW_SIZE int = 1024
+const WINDOW_SIZE int = 255
 
 var window []byte = make([]byte, 0, WINDOW_SIZE)
 
