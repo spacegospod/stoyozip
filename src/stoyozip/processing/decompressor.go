@@ -2,7 +2,6 @@ package processing
 
 import (
 	szio "stoyozip/io"
-	"log"
 )
 
 type Decompressor struct {
@@ -24,7 +23,6 @@ func (d *Decompressor) Run(is *szio.InputFileStream, os *szio.OutputFileStream) 
 		decodedSequence := d.getNextSequence(is)
 		d.slide(decodedSequence)
 		os.WriteBytes(decodedSequence)
-		log.Println(decodedSequence)
 	}
 }
 
