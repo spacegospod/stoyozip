@@ -2,7 +2,6 @@ package io
 
 import (
 	"os"
-	"log"
 )
 
 type OutputFileStream struct {
@@ -22,6 +21,5 @@ func NewOutputFileStream(path string) *OutputFileStream {
 
 func (s *OutputFileStream) WriteBytes(b []byte) {
 	s.file.Write(b)
-	log.Println(b)
 }
 

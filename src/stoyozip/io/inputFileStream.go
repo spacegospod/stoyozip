@@ -30,3 +30,7 @@ func (s *InputFileStream) ReadBytes(n int) []byte {
 	s.bufferIndex = readEnd
 	return result
 }
+
+func (s *InputFileStream) IsEmpty() bool {
+	return s.bufferIndex >= len(s.buffer)
+}

@@ -6,9 +6,9 @@ import (
 )
 
 func main() {
-	r := szio.NewInputFileStream("E:\\git\\stoyozip\\input.txt")
-	w := szio.NewOutputFileStream("E:\\git\\stoyozip\\output.txt")
+	r := szio.NewInputFileStream("E:\\git\\stoyozip\\output.txt")
+	w := szio.NewOutputFileStream("E:\\git\\stoyozip\\restored.txt")
 	
-	c := processing.NewCompressor()
+	c := processing.NewDecompressor()
 	c.Run(r, w)
 }
