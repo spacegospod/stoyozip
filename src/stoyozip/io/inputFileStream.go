@@ -10,14 +10,18 @@ type InputFileStream struct {
 }
 
 // constructor
-func NewInputFileStream(path string) *InputFileStream {
-	// todo handle missing file and nil path
+func NewInputFileStream(path string) (*InputFileStream, error) {
 	s := new(InputFileStream)
-	fileBytes, _ := ioutil.ReadFile(path)
+	fileBytes, err := ioutil.ReadFile(path)
+	
+	if err != nil {
+		return nil, err
+	}
+
 	s.buffer = fileBytes
 	s.bufferIndex = 0
 	
-	return s
+	return s, nil
 }
 
 func (s *InputFileStream) ReadBytes(n int) []byte {

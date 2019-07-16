@@ -17,6 +17,8 @@ const (
 	// parameters
 	INPUT_FILE = "-inputFile"
 	OUTPUT_FILE = "-outputFile"
+	INPUT_FILE_SHORT = "-i"
+	OUTPUT_FILE_SHORT = "-o"
 )
 
 type UserInput struct {
@@ -49,9 +51,9 @@ func parseUserInput(args []string) (UserInput, error) {
 			} else {
 				parts := strings.Split(v, "=")
 				
-				if parts[0] == INPUT_FILE {
+				if parts[0] == INPUT_FILE || parts[0] == INPUT_FILE_SHORT {
 					userInput.inputPath = parts[1]
-				} else if parts[0] == OUTPUT_FILE {
+				} else if parts[0] == OUTPUT_FILE || parts[0] == OUTPUT_FILE_SHORT {
 					userInput.outputPath = parts[1]
 				}
 			}
@@ -79,20 +81,25 @@ func validateUserInput(userInput UserInput) error {
 	return nil
 }
 
+func processError(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func main() {
 	// exclude the actual executable
 	args := os.Args[1:]
 
 	userInput, err := parseUserInput(args)
-	
-	if err != nil {
-		log.Fatal(err)
-	}
+	processError(err)
 
 	p := getProcessor(userInput.command)
 
-	in := szio.NewInputFileStream(userInput.inputPath)
-	out := szio.NewOutputFileStream(userInput.outputPath)
+	in, err := szio.NewInputFileStream(userInput.inputPath)
+	processError(err)
+	out, err := szio.NewOutputFileStream(userInput.outputPath)
+	processError(err)
 
 	p.Run(in, out)
 }

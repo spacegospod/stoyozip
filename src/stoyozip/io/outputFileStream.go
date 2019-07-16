@@ -9,14 +9,17 @@ type OutputFileStream struct {
 }
 
 // constructor
-func NewOutputFileStream(path string) *OutputFileStream {
-	// todo handle nil path
+func NewOutputFileStream(path string) (*OutputFileStream, error) {
 	s := new(OutputFileStream)
-	f, _ := os.Create(path)
+	f, err := os.Create(path)
+	
+	if err != nil {
+		return nil, err
+	}
 	
 	s.file = f
 	
-	return s
+	return s, nil
 }
 
 func (s *OutputFileStream) WriteBytes(b []byte) {
