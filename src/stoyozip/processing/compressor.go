@@ -72,10 +72,9 @@ func (c *Compressor) findLongestMatch() (int, int) {
 	}
 	
 	var p, l int = 0, 0
-	
-	// todo: i := 3
+
 	// Matches of less than 3 bytes are not efficient
-	for i := 1; i < len(c.lookaheadBuf) + 1; i++ {
+	for i := 3; i <= len(c.lookaheadBuf); i++ {
 		sequence := c.lookaheadBuf[:i]
 		matchIndex := c.testSequence(sequence)
 		
