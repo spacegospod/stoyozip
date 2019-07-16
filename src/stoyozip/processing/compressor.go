@@ -39,11 +39,27 @@ func (c *Compressor) Run(is *szio.InputFileStream, os *szio.OutputFileStream) {
 }
 
 func (c *Compressor) slide(is *szio.InputFileStream, n int) {
-	wi := n - 1;
-	if wi > len(c.window) {
-		wi = 0
+	// index to slice the window from
+	var i int = n 
+	
+	// capacity not reached yet
+	if len(c.window) < WINDOW_CAP {
+		// amount remaining bytes in window
+		r := WINDOW_CAP - len(c.window)
+		
+		if n > r {
+			i = n - r
+		} else {
+			i = 0
+		}
 	}
-	newWindow := append(c.window[wi:], c.lookaheadBuf[:n]...)
+	
+	// prevent slice out of range
+	if i > len(c.window) {
+		i = len(c.window)
+	}
+	
+	newWindow := append(c.window[i:], c.lookaheadBuf[:n]...)
 	c.window = newWindow
 	
 	newBuffer := append(c.lookaheadBuf[n:], is.ReadBytes(n)...)
@@ -60,12 +76,12 @@ func (c *Compressor) findLongestMatch() (int, int) {
 	// todo: i := 3
 	// Matches of less than 3 bytes are not efficient
 	for i := 1; i < len(c.lookaheadBuf) + 1; i++ {
-		testSlice := c.lookaheadBuf[:i]
-		matchIndex := c.testSequence(testSlice)
+		sequence := c.lookaheadBuf[:i]
+		matchIndex := c.testSequence(sequence)
 		
 		if matchIndex > -1 {
 			p = matchIndex
-			l = len(testSlice)
+			l = len(sequence)
 		} else {
 			break
 		}
