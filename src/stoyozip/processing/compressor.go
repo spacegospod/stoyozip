@@ -2,13 +2,16 @@ package processing
 
 import (
 	szio "stoyozip/io"
+	"log"
+	"time"
 )
 
 type Compressor struct {
-	window []byte
-	lookaheadBuf []byte
+	window []byte // The window of already processed bytes
+	lookaheadBuf []byte // The byte sequence yet to be processed
 }
 
+// Constructor function
 func NewCompressor() *Compressor {
 	c := new(Compressor)
 	c.window = make([]byte, 0, WINDOW_CAP)
@@ -19,25 +22,28 @@ func NewCompressor() *Compressor {
 func (c *Compressor) Run(is *szio.InputFileStream, os *szio.OutputFileStream) {
 	c.lookaheadBuf = is.ReadBytes(LOOKAHEAD_BUFFER_CAP)
 
+	start := time.Now()
 	for {
 		if len(c.lookaheadBuf) == 0 {
 			break
 		}
 
-		p, l := c.findLongestMatch()
+		_, l := c.findLongestMatch()
 		
 		if l == 0 {
 			// no match
-			os.WriteBytes([]byte { byte(p), byte(l), c.lookaheadBuf[0] })
+			//os.WriteBytes([]byte { byte(p), byte(l), c.lookaheadBuf[0] })
 			c.slide(is, 1)
 		} else {
 			// match
-			os.WriteBytes([]byte { byte(p), byte(l) })
+			//os.WriteBytes([]byte { byte(p), byte(l) })
 			c.slide(is, l)
 		}
 	}
+	log.Println(time.Now().Sub(start))
 }
 
+// Moves the window and the lookahead buffer n bytes forward
 func (c *Compressor) slide(is *szio.InputFileStream, n int) {
 	// index to slice the window from
 	var i int = n 
@@ -66,6 +72,11 @@ func (c *Compressor) slide(is *szio.InputFileStream, n int) {
 	c.lookaheadBuf = newBuffer
 }
 
+// Find the longest matching sequence between the lookahead buffer and
+// the window.
+// The return value is a pair of pointers (p, l) where
+// p is the number of positions backwards into the sliding window and
+// l is the number of bytes to read after p.
 func (c *Compressor) findLongestMatch() (int, int) {
 	if len(c.window) == 0 || len(c.lookaheadBuf) == 0 {
 		return 0, 0
@@ -75,13 +86,18 @@ func (c *Compressor) findLongestMatch() (int, int) {
 
 	// Matches of less than 3 bytes are not efficient
 	for i := 3; i <= len(c.lookaheadBuf); i++ {
-		sequence := c.lookaheadBuf[:i]
-		matchIndex := c.testSequence(sequence)
+		// get the pointer for a matching sequence of length i
+		matchIndex := c.testSequence(i)
 		
 		if matchIndex > -1 {
+			// match found, update pointers.
+			// will do another loop to check for a match of length i + 1
+			// TODO: do not do an entire loop for i + 1. Instead, find the pointers
+			// to all matches of length i and on the next loop check only those for i + 1
 			p = matchIndex
-			l = len(sequence)
+			l = i
 		} else {
+			// no match found
 			break
 		}
 	}
@@ -89,14 +105,15 @@ func (c *Compressor) findLongestMatch() (int, int) {
 	return p, l
 }
 
-func (c *Compressor) testSequence(sequence []byte) int {
-	if len(sequence) > len(c.window) {
+// Tests whether a match with the provided length can be found for the lookahead buffer
+func (c *Compressor) testSequence(length int) int {
+	if length > len(c.window) {
 		return -1
 	}
 
 	// todo: don't loop backwards
-	for i := len(c.window) - len(sequence); i > -1; i-- {
-		if isSequenceMatch(c.window[i:(i + len(sequence))], sequence) {
+	for i := len(c.window) - length; i > -1; i-- {
+		if c.isSequenceMatch(i, length) {
 			return len(c.window) - i
 		}
 	}
@@ -104,10 +121,9 @@ func (c *Compressor) testSequence(sequence []byte) int {
 	return -1
 }
 
-func isSequenceMatch(windowSlice, sequence []byte) bool {
-	// asumed to be of equal length
-	for i := 0; i < len(windowSlice); i++ {
-		if windowSlice[i] != sequence[i] {
+func (c *Compressor) isSequenceMatch(windowStartIndex, lookaheadBufferEndIndex int) bool {	
+	for i := 0; i < lookaheadBufferEndIndex; i++ {
+		if c.window[i + windowStartIndex] != c.lookaheadBuf[i] {
 			return false
 		}
 	}
