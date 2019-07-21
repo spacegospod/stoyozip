@@ -2,9 +2,9 @@ package main
 
 import (
 	"os"
-	"log"
 	"strings"
 	"errors"
+	"log"
 	szio "stoyozip/io"
 	"stoyozip/processing"
 )
