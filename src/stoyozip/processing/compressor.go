@@ -25,7 +25,7 @@ func (c *Compressor) Run(is *szio.InputFileStream, os *szio.OutputFileStream) {
 			break
 		}
 
-		_, l := c.findLongestMatch()
+		p, l := c.findLongestMatch()
 		
 		if l == 0 {
 			// no match
