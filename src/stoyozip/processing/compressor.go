@@ -106,9 +106,8 @@ func (c *Compressor) testSequence(length int) int {
 	if length > len(c.window) {
 		return -1
 	}
-
-	// todo: don't loop backwards
-	for i := len(c.window) - length; i > -1; i-- {
+	
+	for i := 0; i <= len(c.window) - length; i++ {
 		if c.isSequenceMatch(i, length) {
 			return len(c.window) - i
 		}
