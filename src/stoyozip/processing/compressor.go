@@ -2,8 +2,6 @@ package processing
 
 import (
 	szio "stoyozip/io"
-	"log"
-	"time"
 )
 
 type Compressor struct {
@@ -22,7 +20,6 @@ func NewCompressor() *Compressor {
 func (c *Compressor) Run(is *szio.InputFileStream, os *szio.OutputFileStream) {
 	c.lookaheadBuf = is.ReadBytes(LOOKAHEAD_BUFFER_CAP)
 
-	start := time.Now()
 	for {
 		if len(c.lookaheadBuf) == 0 {
 			break
@@ -32,15 +29,14 @@ func (c *Compressor) Run(is *szio.InputFileStream, os *szio.OutputFileStream) {
 		
 		if l == 0 {
 			// no match
-			//os.WriteBytes([]byte { byte(p), byte(l), c.lookaheadBuf[0] })
+			os.WriteBytes([]byte { byte(p), byte(l), c.lookaheadBuf[0] })
 			c.slide(is, 1)
 		} else {
 			// match
-			//os.WriteBytes([]byte { byte(p), byte(l) })
+			os.WriteBytes([]byte { byte(p), byte(l) })
 			c.slide(is, l)
 		}
 	}
-	log.Println(time.Now().Sub(start))
 }
 
 // Moves the window and the lookahead buffer n bytes forward
