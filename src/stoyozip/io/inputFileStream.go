@@ -72,7 +72,9 @@ func (s *InputFileStream) ReadBytes(n int) []byte {
 			// Do not allow another swap before the secondary
 			// has been refilled.
 			s.swapMutex.Lock()
-			go s.swapBuffers()
+			s.primaryBuffer = s.secondaryBuffer
+			s.bufferIndex = 0
+			go s.refillSecondaryBuffer()
 		}
 	}
 	
@@ -83,10 +85,8 @@ func (s *InputFileStream) IsEmpty() bool {
 	return len(s.primaryBuffer) == 0 && len(s.secondaryBuffer) == 0
 }
 
-func (s *InputFileStream) swapBuffers() {
-	s.primaryBuffer = s.secondaryBuffer
+func (s *InputFileStream) refillSecondaryBuffer() {
 	s.secondaryBuffer = s.getNextBuffer()
-	s.bufferIndex = 0
 	s.swapMutex.Unlock()
 }
 
