@@ -65,6 +65,8 @@ func (s *OutputFileStream) WriteBytes(b []byte) {
 }
 
 func (s *OutputFileStream) Flush() {
+	// Need to lock both to prevent flushing
+	// before the last regular write has finished
 	s.writeMutex.Lock()
 	s.swapMutex.Lock()
 	s.file.Write(s.primaryBuffer)
