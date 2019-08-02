@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	BUFFER_SIZE = 256
+	INPUT_BUFFER_SIZE = 256
 )
 
 type InputFileStream struct {
@@ -91,7 +91,7 @@ func (s *InputFileStream) refillSecondaryBuffer() {
 }
 
 func (s *InputFileStream) getNextBuffer() []byte {
-	buffer := make([]byte, BUFFER_SIZE, BUFFER_SIZE)
+	buffer := make([]byte, INPUT_BUFFER_SIZE, INPUT_BUFFER_SIZE)
 
 	n, err := s.file.Read(buffer)
 	

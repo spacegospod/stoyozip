@@ -102,4 +102,6 @@ func main() {
 	processError(err)
 
 	p.Run(in, out)
+	
+	out.Flush()
 }
