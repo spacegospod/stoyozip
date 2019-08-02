@@ -3,6 +3,8 @@ Rookie LZ77-based file compressor
 
 HOW TO USE
 
--c [file_to_compress] [output_file]
+// to compress
+-c -i=<path_to_input_file> -o=<path_to_output_file>
 
--x [file_to_decompress] [output_file]
+// to decompress
+-x -i=<path_to_input_file> -o=<path_to_output_file>
