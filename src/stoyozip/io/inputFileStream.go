@@ -15,7 +15,7 @@ type InputFileStream struct {
 	secondaryBuffer []byte
 	bufferIndex int
 	file *os.File
-	
+
 	// locks
 	swapMutex sync.Mutex
 }
@@ -23,15 +23,15 @@ type InputFileStream struct {
 // constructor
 func NewInputFileStream(path string) (*InputFileStream, error) {
 	s := new(InputFileStream)
-	
+
 	f, err := os.Open(path)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	s.file = f
-	
+
 	// prepare both buffers
 	s.primaryBuffer = s.getNextBuffer()
 	s.secondaryBuffer = s.getNextBuffer()
@@ -46,13 +46,13 @@ func NewInputFileStream(path string) (*InputFileStream, error) {
 func (s *InputFileStream) ReadBytes(n int) []byte {
 	var result []byte = make([]byte, 0, n)
 	var remaining = n
-	
+
 	for {
 		// done reading or nothing left in stream
 		if remaining == 0 || s.IsEmpty() {
 			break
 		}
-		
+
 		var readStart = s.bufferIndex
 		var readEnd = readStart + remaining
 
@@ -63,7 +63,7 @@ func (s *InputFileStream) ReadBytes(n int) []byte {
 		}
 		result = append(result, s.primaryBuffer[readStart:readEnd]...)
 		s.bufferIndex = readEnd
-		
+
 		var bytesRead = readEnd - readStart
 		remaining -= bytesRead
 
@@ -77,7 +77,7 @@ func (s *InputFileStream) ReadBytes(n int) []byte {
 			go s.refillSecondaryBuffer()
 		}
 	}
-	
+
 	return result
 }
 
@@ -92,12 +92,12 @@ func (s *InputFileStream) refillSecondaryBuffer() {
 
 func (s *InputFileStream) getNextBuffer() []byte {
 	buffer := make([]byte, BUFFER_SIZE, BUFFER_SIZE)
-	
+
 	n, err := s.file.Read(buffer)
 	
 	if n == 0 && err == io.EOF {
 		return make([]byte, 0, 0)
 	}
-	
+
 	return buffer[:n]
 }

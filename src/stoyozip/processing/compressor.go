@@ -13,7 +13,7 @@ type Compressor struct {
 func NewCompressor() *Compressor {
 	c := new(Compressor)
 	c.window = make([]byte, 0, WINDOW_CAP)
-	
+
 	return c
 }
 
@@ -26,7 +26,7 @@ func (c *Compressor) Run(is *szio.InputFileStream, os *szio.OutputFileStream) {
 		}
 
 		p, l := c.findLongestMatch()
-		
+
 		if l == 0 {
 			// no match
 			os.WriteBytes([]byte { byte(p), byte(l), c.lookaheadBuf[0] })
@@ -43,27 +43,27 @@ func (c *Compressor) Run(is *szio.InputFileStream, os *szio.OutputFileStream) {
 func (c *Compressor) slide(is *szio.InputFileStream, n int) {
 	// index to slice the window from
 	var i int = n 
-	
+
 	// capacity not reached yet
 	if len(c.window) < WINDOW_CAP {
 		// amount remaining bytes in window
 		r := WINDOW_CAP - len(c.window)
-		
+
 		if n > r {
 			i = n - r
 		} else {
 			i = 0
 		}
 	}
-	
+
 	// prevent slice out of range
 	if i > len(c.window) {
 		i = len(c.window)
 	}
-	
+
 	newWindow := append(c.window[i:], c.lookaheadBuf[:n]...)
 	c.window = newWindow
-	
+
 	newBuffer := append(c.lookaheadBuf[n:], is.ReadBytes(n)...)
 	c.lookaheadBuf = newBuffer
 }
@@ -77,14 +77,14 @@ func (c *Compressor) findLongestMatch() (int, int) {
 	if len(c.window) == 0 || len(c.lookaheadBuf) == 0 {
 		return 0, 0
 	}
-	
+
 	var p, l int = 0, 0
 
 	// Matches of less than 3 bytes are not efficient
 	for i := 3; i <= len(c.lookaheadBuf); i++ {
 		// get the pointer for a matching sequence of length i
 		matchIndex := c.testSequence(i)
-		
+
 		if matchIndex > -1 {
 			// match found, update pointers.
 			// will do another loop to check for a match of length i + 1
@@ -97,7 +97,7 @@ func (c *Compressor) findLongestMatch() (int, int) {
 			break
 		}
 	}
-	
+
 	return p, l
 }
 
@@ -106,13 +106,13 @@ func (c *Compressor) testSequence(length int) int {
 	if length > len(c.window) {
 		return -1
 	}
-	
+
 	for i := 0; i <= len(c.window) - length; i++ {
 		if c.isSequenceMatch(i, length) {
 			return len(c.window) - i
 		}
 	}
-	
+
 	return -1
 }
 

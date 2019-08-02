@@ -12,11 +12,11 @@ type OutputFileStream struct {
 func NewOutputFileStream(path string) (*OutputFileStream, error) {
 	s := new(OutputFileStream)
 	f, err := os.Create(path)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	s.file = f
 	
 	return s, nil

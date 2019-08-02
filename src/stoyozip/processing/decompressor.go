@@ -11,7 +11,7 @@ type Decompressor struct {
 func NewDecompressor() *Decompressor {
 	d := new(Decompressor)
 	d.window = make([]byte, 0, WINDOW_CAP)
-	
+
 	return d
 }
 
@@ -28,7 +28,7 @@ func (d *Decompressor) Run(is *szio.InputFileStream, os *szio.OutputFileStream) 
 
 func (d *Decompressor) getNextSequence(is *szio.InputFileStream) []byte {
 	pointer := is.ReadBytes(2)
-	
+
 	if pointer[0] == 0 && pointer[1] == 0 {
 		return is.ReadBytes(1)
 	} else {
@@ -42,24 +42,24 @@ func (d *Decompressor) getNextSequence(is *szio.InputFileStream) []byte {
 func (d *Decompressor) slide(sequence []byte) {
 	// index to slice the window from
 	var i int = len(sequence)
-	
+
 	// capacity not reached yet
 	if len(d.window) < WINDOW_CAP {
 		// amount remaining bytes in window
 		r := WINDOW_CAP - len(d.window)
-		
+
 		if len(sequence) > r {
 			i = len(sequence) - r
 		} else {
 			i = 0
 		}
 	}
-	
+
 	// prevent slice out of range
 	if i > len(d.window) {
 		i = len(d.window)
 	}
-	
+
 	newWindow := append(d.window[i:], sequence...)
 	d.window = newWindow
 }
