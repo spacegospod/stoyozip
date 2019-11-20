@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	OUTPUT_BUFFER_SIZE = 256
+	OUTPUT_BUFFER_SIZE = 4 * 1024 // 4KB
 )
 
 type OutputFileStream struct {

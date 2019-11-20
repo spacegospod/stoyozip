@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	WINDOW_CAP = 256 // bytes
-	LOOKAHEAD_BUFFER_CAP = 256 // bytes
+	WINDOW_CAP = 255 // bytes
+	LOOKAHEAD_BUFFER_CAP = 255 // bytes
 )
 
 type Processor interface {
